@@ -1,5 +1,6 @@
 package com.primosjoyeria.ui.theme.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.primosjoyeria.ui.theme.FormViewModel
 import com.primosjoyeria.ui.theme.EstadoFormularioLogin
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.painterResource
+import com.primosjoyeria.R
 
 
 @Composable
@@ -37,6 +40,14 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo Primos Joyería",
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(bottom = 16.dp)
+            )
+
             Text("Bienvenido a Primos Joyería", style = MaterialTheme.typography.headlineSmall)
 
             OutlinedTextField(

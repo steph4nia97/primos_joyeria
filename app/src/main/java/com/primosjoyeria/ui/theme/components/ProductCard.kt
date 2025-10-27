@@ -1,9 +1,12 @@
 package com.primosjoyeria.ui.theme.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.util.clp
@@ -13,11 +16,13 @@ import coil.compose.AsyncImage
 fun ProductCard(product: Product, onAdd: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp)) {
-            if (product.imagenUrl != null) {
-                AsyncImage(
-                    model = product.imagenUrl,
+                Image(
+                    painter = painterResource(id = product.imagenRes),
                     contentDescription = product.nombre,
-                    modifier = Modifier.fillMaxWidth().height(160.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    contentScale = ContentScale.FillWidth
                 )
                 Spacer(Modifier.height(8.dp))
             }
@@ -28,4 +33,3 @@ fun ProductCard(product: Product, onAdd: () -> Unit) {
             Row { Button(onClick = onAdd) { Text("Agregar") } }
         }
     }
-}

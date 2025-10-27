@@ -4,6 +4,7 @@ import com.primosjoyeria.data.local.ProductoDao
 import com.primosjoyeria.data.model.CartItem
 import com.primosjoyeria.data.model.Product
 import kotlinx.coroutines.flow.Flow
+import com.primosjoyeria.R
 
 // ---- Interfaz del repositorio ----
 interface CatalogRepository {
@@ -15,7 +16,7 @@ interface CatalogRepository {
     suspend fun quitarDelCarrito(productId: Int)
     suspend fun vaciarCarrito()
 
-    // 🆕 Funciones para el panel de administración
+    //Funciones para el panel de administración
     suspend fun agregarProducto(nombre: String, precio: Int)
     suspend fun eliminarProducto(id: Int)
 }
@@ -29,9 +30,9 @@ class CatalogRepositoryRoom(private val dao: ProductoDao) : CatalogRepository {
     override suspend fun seedIfEmpty() {
         if (dao.countProductos() == 0) {
             val inicial = listOf(
-                Product(nombre = "Aros Perla", precio = 12990),
-                Product(nombre = "Collar Plata 925", precio = 24990),
-                Product(nombre = "Pulsera Acero", precio = 14990)
+                Product(nombre = "Aros Perla", precio = 12990, imagenRes = R.drawable.aros_perla),
+                Product(nombre = "Collar Plata 925", precio = 24990,imagenRes = R.drawable.collar_plata),
+                Product(nombre = "Pulsera Acero", precio = 14990,imagenRes = R.drawable.pulsera_acero)
             )
             dao.insertProductos(inicial)
         }
@@ -63,13 +64,13 @@ class CatalogRepositoryRoom(private val dao: ProductoDao) : CatalogRepository {
         dao.vaciarCarrito()
     }
 
-    // 🟩 Agregar nuevo producto (desde el panel admin)
+    //Agregar nuevo producto (desde el panel admin)
     override suspend fun agregarProducto(nombre: String, precio: Int) {
-        val nuevo = Product(nombre = nombre, precio = precio)
+        val nuevo = Product(nombre = nombre, precio = precio, imagenRes = R.drawable.logo)
         dao.insertProductos(listOf(nuevo))
     }
 
-    // 🟩 Eliminar producto por ID
+    //Eliminar producto por ID
     override suspend fun eliminarProducto(id: Int) {
         dao.eliminarProductoPorId(id)
     }

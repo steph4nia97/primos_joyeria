@@ -11,6 +11,7 @@ import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.ui.theme.components.ProductCard
 import androidx.compose.foundation.layout.Arrangement
 import com.primosjoyeria.ui.theme.UiState
+import com.primosjoyeria.ui.theme.components.AnimatedButton
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
@@ -25,7 +26,10 @@ fun CatalogoScreen(
             TopAppBar(
                 title = { Text("Catálogo Joyería") },
                 actions = {
-                    Button(onClick = goCarrito) {
+                    AnimatedButton(
+                        onClick = goCarrito,
+                        modifier = Modifier.height(36.dp)
+                    ){
                         Text("Carrito (${state.carrito.size})")
                     }
                 }

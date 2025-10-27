@@ -7,7 +7,7 @@ data class Product(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nombre: String,
     val precio: Int,
-    val imagenUrl: String = "" // 👈 nuevo campo opcional
+    val imagenRes: Int
 
 )
 
