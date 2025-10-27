@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.primosjoyeria.data.model.CartItem
 import com.primosjoyeria.data.model.Product
 
-@Database(entities = [Product::class, CartItem::class], version = 1)
+@Database(entities = [Product::class, CartItem::class], version = 2)
 abstract class AppDb : RoomDatabase() {
     abstract fun productoDao(): ProductoDao
 }

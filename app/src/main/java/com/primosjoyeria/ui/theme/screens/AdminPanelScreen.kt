@@ -14,6 +14,48 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.ArrowBack
 
 
+
+
+@Composable
+fun EditProductDialog(
+    initialName: String,
+    initialPrice: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (newName: String, newPrice: Int) -> Unit
+) {
+    var nombre by remember { mutableStateOf(initialName) }
+    var precio by remember { mutableStateOf(initialPrice.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Editar producto") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") }
+                )
+                OutlinedTextField(
+                    value = precio,
+                    onValueChange = { precio = it.filter { ch -> ch.isDigit() } },
+                    label = { Text("Precio") }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val nuevoPrecio = precio.toIntOrNull()
+                if (nombre.isNotBlank() && nuevoPrecio != null) {
+                    onConfirm(nombre.trim(), nuevoPrecio)
+                }
+            }) { Text("Guardar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminPanelScreen(
@@ -22,15 +64,15 @@ fun AdminPanelScreen(
 ) {
     val scope = rememberCoroutineScope()
     var productos by remember { mutableStateOf<List<Product>>(emptyList()) }
-
-    // Cargar productos de la BD
-    LaunchedEffect(Unit) {
-        repo.productos().collect { productos = it }
-    }
-
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf<String?>(null) }
+    var editing by remember { mutableStateOf<Product?>(null) } // 👈 producto en edición
+
+    // Cargar productos desde la BD
+    LaunchedEffect(Unit) {
+        repo.productos().collect { productos = it }
+    }
 
     Scaffold(
         topBar = {
@@ -64,7 +106,7 @@ fun AdminPanelScreen(
 
             OutlinedTextField(
                 value = precio,
-                onValueChange = { precio = it },
+                onValueChange = { precio = it.filter { ch -> ch.isDigit() } },
                 label = { Text("Precio") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -116,7 +158,13 @@ fun AdminPanelScreen(
                                 Text("$${producto.precio}", style = MaterialTheme.typography.bodyMedium)
                             }
 
-                            Row {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                // 🔸 Botón Editar
+                                TextButton(onClick = { editing = producto }) {
+                                    Text("Editar")
+                                }
+
+                                // 🔸 Botón Eliminar
                                 TextButton(onClick = {
                                     scope.launch {
                                         repo.eliminarProducto(producto.id)
@@ -130,5 +178,21 @@ fun AdminPanelScreen(
                 }
             }
         }
+    }
+
+    // 🔹 Mostrar diálogo si hay un producto en edición
+    editing?.let { producto ->
+        EditProductDialog(
+            initialName = producto.nombre,
+            initialPrice = producto.precio,
+            onDismiss = { editing = null },
+            onConfirm = { newName, newPrice ->
+                scope.launch {
+                    repo.actualizarProducto(producto.id, newName, newPrice)
+                    mensaje = "Producto actualizado correctamente"
+                    editing = null
+                }
+            }
+        )
     }
 }

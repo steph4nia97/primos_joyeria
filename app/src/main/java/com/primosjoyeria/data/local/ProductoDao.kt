@@ -27,6 +27,11 @@ interface ProductoDao {
     @Query("SELECT COUNT(*) FROM producto")
     suspend fun countProductos(): Int
 
+    @Query("UPDATE producto SET nombre = :nombre, precio = :precio WHERE id = :id")
+    suspend fun updateCampos(id: Int, nombre: String, precio: Int)
+
+    @Query("SELECT * FROM producto WHERE id = :id LIMIT 1")
+    suspend fun findById(id: Long): Product?
 
 
     // ===== Carrito =====

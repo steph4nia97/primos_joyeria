@@ -19,6 +19,9 @@ interface CatalogRepository {
     //Funciones para el panel de administración
     suspend fun agregarProducto(nombre: String, precio: Int)
     suspend fun eliminarProducto(id: Int)
+
+    suspend fun actualizarProducto(id: Int, nombre: String, precio: Int)
+
 }
 
 // ---- Implementación con Room ----
@@ -31,8 +34,16 @@ class CatalogRepositoryRoom(private val dao: ProductoDao) : CatalogRepository {
         if (dao.countProductos() == 0) {
             val inicial = listOf(
                 Product(nombre = "Aros Perla", precio = 12990, imagenRes = R.drawable.aros_perla),
-                Product(nombre = "Collar Plata 925", precio = 24990,imagenRes = R.drawable.collar_plata),
-                Product(nombre = "Pulsera Acero", precio = 14990,imagenRes = R.drawable.pulsera_acero)
+                Product(
+                    nombre = "Collar Plata 925",
+                    precio = 24990,
+                    imagenRes = R.drawable.collar_plata
+                ),
+                Product(
+                    nombre = "Pulsera Acero",
+                    precio = 14990,
+                    imagenRes = R.drawable.pulsera_acero
+                )
             )
             dao.insertProductos(inicial)
         }
@@ -74,4 +85,10 @@ class CatalogRepositoryRoom(private val dao: ProductoDao) : CatalogRepository {
     override suspend fun eliminarProducto(id: Int) {
         dao.eliminarProductoPorId(id)
     }
+
+    override suspend fun actualizarProducto(id: Int, nombre: String, precio: Int) {
+        // Con @Query:
+        dao.updateCampos(id, nombre, precio)
+    }
 }
+

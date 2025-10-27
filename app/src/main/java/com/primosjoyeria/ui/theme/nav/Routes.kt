@@ -11,4 +11,7 @@ object Routes {
     // 🔹 Pantallas del administrador
     const val AdminLogin = "admin_login"
     const val AdminPanel = "admin_panel"
+
+    const val LOGIN = "login"
+    const val HOME  = "home"
 }
