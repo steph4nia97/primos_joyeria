@@ -1,21 +1,35 @@
 package com.primosjoyeria.data.local
 
 import androidx.room.*
-import com.primosjoyeria.data.model.CartItem
 import com.primosjoyeria.data.model.Product
+import com.primosjoyeria.data.model.CartItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductoDao {
-    @Query("SELECT * FROM productos ORDER BY nombre")
+
+    // ===== Catálogo =====
+    @Query("SELECT * FROM producto")
     fun observarProductos(): Flow<List<Product>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProductos(items: List<Product>)
+    suspend fun insertProductos(productos: List<Product>)
 
-    @Query("SELECT COUNT(*) FROM productos")
+    @Update
+    suspend fun actualizarProducto(producto: Product)
+
+    @Delete
+    suspend fun eliminarProducto(producto: Product)
+
+    @Query("DELETE FROM producto WHERE id = :id")
+    suspend fun eliminarProductoPorId(id: Int)
+
+    @Query("SELECT COUNT(*) FROM producto")
     suspend fun countProductos(): Int
 
+
+
+    // ===== Carrito =====
     @Query("SELECT * FROM carrito")
     fun observarCarrito(): Flow<List<CartItem>>
 

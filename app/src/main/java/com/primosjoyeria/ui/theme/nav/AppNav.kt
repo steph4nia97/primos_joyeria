@@ -10,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.primosjoyeria.data.repository.CatalogRepository
+import com.primosjoyeria.ui.theme.screens.AdminLoginScreen
+import com.primosjoyeria.ui.theme.screens.AdminPanelScreen
 import com.primosjoyeria.ui.theme.AppViewModel
 import com.primosjoyeria.ui.theme.UiState
 import com.primosjoyeria.ui.theme.screens.CarritoScreen
@@ -32,21 +34,22 @@ fun AppNav(repo: CatalogRepository) {
 
     LaunchedEffect(Unit) { vm.seedIfEmpty() }
 
-    // 👇 Nómbralo distinto y tipalo explícitamente
     val uiState: UiState = vm.state.collectAsStateWithLifecycle().value
+
     NavHost(navController = nav, startDestination = Routes.Login) {
         composable(Routes.Login) {
             LoginScreen(
                 alIniciarSesion = { correo, pass ->
-                    // Aquí puedes validar el login o navegar directo
                     nav.navigate(Routes.Catalogo)
                 },
-                alRegistrarClick = {
-                    // Podrías agregar luego una pantalla de registro
-                }
+                alRegistrarClick = { /* registrar */ },
+                onAdminClick = { nav.navigate(Routes.AdminLogin) } // 👈 aquí lo conectas
             )
         }
 
+
+
+        // Resto de tus pantallas (catálogo, carrito, etc.)
         composable(Routes.Catalogo) {
             CatalogoScreen(
                 state = uiState,
@@ -65,5 +68,21 @@ fun AppNav(repo: CatalogRepository) {
                 goBack = { nav.popBackStack() }
             )
         }
+
+        // 👉 Ruta nueva del login admin (ya creada antes)
+        composable(Routes.AdminLogin) {
+            AdminLoginScreen(
+                onLoginSuccess = { nav.navigate(Routes.AdminPanel) },
+                onBack = { nav.popBackStack() }
+            )
+        }
+
+        composable(Routes.AdminPanel) {
+            AdminPanelScreen(
+                repo = repo,
+                goBack = { nav.popBackStack() }
+            )
+        }
+
     }
 }

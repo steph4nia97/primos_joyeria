@@ -2,14 +2,13 @@ package com.primosjoyeria.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-@Entity(tableName = "productos")
+@Entity(tableName = "producto")
 data class Product(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nombre: String,
     val precio: Int,
-    val imagenUrl: String? = null,
-    val stock: Int = 0
+    val imagenUrl: String = "" // 👈 nuevo campo opcional
+
 )
 
 @Entity(tableName = "carrito")

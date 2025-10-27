@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 fun LoginScreen(
     alIniciarSesion: (String, String) -> Unit,
     alRegistrarClick: () -> Unit,
+    onAdminClick: () -> Unit,  // boton admin
     vm: FormViewModel = viewModel()
 ) {
     val formulario: EstadoFormularioLogin = vm.estado.collectAsState().value
@@ -88,11 +89,20 @@ fun LoginScreen(
                 enabled = formulario.email.valor.isNotBlank() &&
                         formulario.password.valor.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Iniciar sesión") }
+            ) {
+                Text("Iniciar sesión")
+            }
 
             TextButton(onClick = alRegistrarClick) {
                 Text("¿No tienes cuenta? Regístrate aquí")
             }
+
+
+            TextButton(onClick = { onAdminClick() }) {
+                Text("¿Eres administrador? Inicia sesión aquí")
+            }
+
+
         }
     }
 }
