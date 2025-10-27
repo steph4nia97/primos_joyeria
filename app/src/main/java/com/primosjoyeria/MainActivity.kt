@@ -12,17 +12,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Crear DB + DAO + Repo
+        // Crear DB (Room)
         val db = Room.databaseBuilder(
             applicationContext,
             AppDb::class.java,
             "primos_db"
-        ).fallbackToDestructiveMigration().build()
+        )
+            //.addMigrations(MIGRATION_2_3) // usa migración si no quieres borrar datos
+            .fallbackToDestructiveMigration()
+            .build()
 
-        val repo = CatalogRepositoryRoom(db.productoDao())
+        // Repositorio con ambos DAOs: productos + usuarios
+        val repo = CatalogRepositoryRoom(
+            dao = db.productoDao(),
+            userDao = db.userDao()
+        )
 
         setContent {
-            AppNav(repo) // ← tu nav recibe el repo
+            AppNav(repo)
         }
     }
 }
+

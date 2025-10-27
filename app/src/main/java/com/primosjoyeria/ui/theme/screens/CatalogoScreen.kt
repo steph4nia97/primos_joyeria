@@ -19,18 +19,27 @@ import com.primosjoyeria.ui.theme.components.AnimatedButton
 fun CatalogoScreen(
     state: UiState,
     onAdd: (Product) -> Unit,
-    goCarrito: () -> Unit
+    goCarrito: () -> Unit,
+    onLogout: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Catálogo Joyería") },
                 actions = {
+                    // 🔹 Botón Carrito (ya lo tenías)
                     AnimatedButton(
                         onClick = goCarrito,
                         modifier = Modifier.height(36.dp)
-                    ){
+                    ) {
                         Text("Carrito (${state.carrito.size})")
+                    }
+
+                    Spacer(Modifier.width(8.dp)) // separador visual
+
+                    // 🔹 Botón Cerrar sesión
+                    TextButton(onClick = onLogout) {
+                        Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             )

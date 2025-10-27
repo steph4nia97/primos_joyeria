@@ -16,9 +16,11 @@ import com.primosjoyeria.ui.theme.AppViewModel
 import com.primosjoyeria.ui.theme.UiState
 import com.primosjoyeria.ui.theme.screens.CarritoScreen
 import com.primosjoyeria.ui.theme.screens.LoginScreen
-
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.primosjoyeria.ui.theme.screens.CatalogoScreen
-import com.primosjoyeria.ui.theme.nav.Routes
+import com.primosjoyeria.ui.theme.screens.RegistroScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNav(repo: CatalogRepository) {
@@ -35,29 +37,56 @@ fun AppNav(repo: CatalogRepository) {
     LaunchedEffect(Unit) { vm.seedIfEmpty() }
 
     val uiState: UiState = vm.state.collectAsStateWithLifecycle().value
+    val scope = rememberCoroutineScope()
 
     NavHost(navController = nav, startDestination = Routes.Login) {
+        // LOGIN (usuarios de tabla usuario)
         composable(Routes.Login) {
             LoginScreen(
                 alIniciarSesion = { correo, pass ->
-                    nav.navigate(Routes.Catalogo)
+                    scope.launch {
+                        val ok = repo.verificarCredenciales(correo, pass)
+                        if (ok) {
+                            nav.navigate(Routes.Catalogo) {
+                                popUpTo(Routes.Login) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            // Si tu LoginScreen tiene forma de mostrar error, puedes disparar ahí.
+                            // Aquí, simplemente no navega si no es válido.
+                        }
+                    }
                 },
-                alRegistrarClick = { /* registrar */ },
-                onAdminClick = { nav.navigate(Routes.AdminLogin) } // 👈 aquí lo conectas
+                alRegistrarClick = { nav.navigate(Routes.Registro) },
+                onAdminClick = { nav.navigate(Routes.AdminLogin) }
             )
         }
 
+        // REGISTRO
+        composable(Routes.Registro) {
+            RegistroScreen(
+                onRegistrar = { correo, pass, sexo, edad ->
+                    repo.registrarUsuario(correo, pass, sexo, edad)
+                },
+                onRegistroExitoso = { nav.popBackStack() }, // vuelve al Login
+                goBack = { nav.popBackStack() }
+            )
+        }
 
-
-        // Resto de tus pantallas (catálogo, carrito, etc.)
         composable(Routes.Catalogo) {
             CatalogoScreen(
                 state = uiState,
                 onAdd = vm::addToCart,
-                goCarrito = { nav.navigate(Routes.Carrito) }
+                goCarrito = { nav.navigate(Routes.Carrito) },
+                onLogout = { // 👈 si ya agregaste el botón de cerrar sesión
+                    nav.navigate(Routes.Login) {
+                        popUpTo(Routes.Login) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
-
+        // CARRITO
         composable(Routes.Carrito) {
             CarritoScreen(
                 state = uiState,
@@ -69,7 +98,7 @@ fun AppNav(repo: CatalogRepository) {
             )
         }
 
-        // 👉 Ruta nueva del login admin (ya creada antes)
+        // ADMIN LOGIN
         composable(Routes.AdminLogin) {
             AdminLoginScreen(
                 onLoginSuccess = { nav.navigate(Routes.AdminPanel) },
@@ -77,12 +106,17 @@ fun AppNav(repo: CatalogRepository) {
             )
         }
 
+        // ADMIN PANEL
         composable(Routes.AdminPanel) {
             AdminPanelScreen(
                 repo = repo,
-                goBack = { nav.popBackStack() }
+                goBack = {
+                    nav.navigate(Routes.Login) {
+                        popUpTo(Routes.Login) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
-
     }
 }

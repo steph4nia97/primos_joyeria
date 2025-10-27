@@ -82,6 +82,14 @@ fun AdminPanelScreen(
                     IconButton(onClick = goBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
+                },
+                actions = {
+                    TextButton(onClick = {
+                        // defines qué hace al cerrar sesión
+                        goBack()
+                    }) {
+                        Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
+                    }
                 }
             )
         }

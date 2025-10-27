@@ -4,6 +4,9 @@ object Routes {
     // 🔹 Pantalla de inicio de sesión para usuarios normales
     const val Login = "login"
 
+    const val Registro = "registro"
+
+
     // 🔹 Pantallas de la tienda
     const val Catalogo = "catalogo"
     const val Carrito = "carrito"
