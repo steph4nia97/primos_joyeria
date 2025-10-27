@@ -8,7 +8,7 @@ import com.primosjoyeria.data.model.User
 import kotlinx.coroutines.flow.Flow
 import com.primosjoyeria.R
 
-// ---- Repository interface ----
+//interfaz del repo
 interface CatalogRepository {
     fun productos(): Flow<List<Product>>
     fun carrito(): Flow<List<CartItem>>
@@ -23,12 +23,12 @@ interface CatalogRepository {
     suspend fun eliminarProducto(id: Int)
     suspend fun actualizarProducto(id: Int, nombre: String, precio: Int)
 
-    // Users
+    // usuarios
     suspend fun registrarUsuario(correo: String, password: String, sexo: String, edad: Int): Result<Unit>
     suspend fun verificarCredenciales(correo: String, password: String): Boolean
 }
 
-// ---- Implementation using Room ----
+//implementacion usando Room
 class CatalogRepositoryRoom(
     private val dao: ProductoDao,
     private val userDao: UserDao

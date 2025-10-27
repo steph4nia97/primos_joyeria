@@ -62,7 +62,7 @@ fun CatalogoScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // 💎 Lista de productos con imagen
+            //Lista de productos con imagen
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(state.productos, key = { it.id }) { producto ->
                     Card(
@@ -72,7 +72,7 @@ fun CatalogoScreen(
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            // 🔹 Imagen del producto
+                            //imagen del producto
                             Image(
                                 painter = painterResource(id = producto.imagenRes),
                                 contentDescription = producto.nombre,
@@ -84,13 +84,13 @@ fun CatalogoScreen(
 
                             Spacer(Modifier.height(8.dp))
 
-                            // 🔹 Datos del producto
+                            //Datos del producto
                             Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
                             Text("$${producto.precio}", style = MaterialTheme.typography.bodyMedium)
 
                             Spacer(Modifier.height(8.dp))
 
-                            // 🔹 Botón para agregar al carrito
+                            //Botón para agregar al carrito
                             Button(
                                 onClick = {
                                     onAdd(producto)

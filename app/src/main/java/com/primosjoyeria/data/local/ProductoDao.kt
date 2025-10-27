@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProductoDao {
 
-    // ======== Catálogo ========
+    //Catalogo
 
     @Query("SELECT * FROM producto")
     fun observarProductos(): Flow<List<Product>>
@@ -35,7 +35,7 @@ interface ProductoDao {
     suspend fun findById(id: Long): Product?
 
 
-    // ======== Carrito ========
+    //carrito
 
     @Query("SELECT * FROM carrito")
     fun observarCarrito(): Flow<List<CartItem>>

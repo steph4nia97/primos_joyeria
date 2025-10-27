@@ -26,7 +26,7 @@ fun RegistroScreen(
 
     val scope = rememberCoroutineScope()
 
-    // --- Validaciones ---
+    //validaciones
     fun correoValido(c: String): Boolean =
         android.util.Patterns.EMAIL_ADDRESS.matcher(c).matches()
     fun passValida(p: String): Boolean = p.length >= 6
@@ -155,7 +155,7 @@ fun RegistroScreen(
                             scope.launch {
                                 val res = onRegistrar(correo, pass, sexo, e!!)
                                 if (res.isSuccess) {
-                                    mensaje = "✅ Usuario registrado correctamente"
+                                    mensaje = "Usuario registrado correctamente"
                                     delay(1200)
                                     onRegistroExitoso()
                                 } else {
@@ -170,11 +170,11 @@ fun RegistroScreen(
                 Text("Registrar cuenta")
             }
 
-            // 📨 Mensaje final
+            // Mensaje final
             mensaje?.let {
                 Text(
                     it,
-                    color = if (it.contains("✅")) MaterialTheme.colorScheme.primary
+                    color = if (it.contains("correctamente")) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium
                 )

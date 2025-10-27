@@ -57,7 +57,7 @@ class FormViewModel : ViewModel() {
     }
 }
 
-/* === Reglas de validación === */
+//reglas de validación
 private fun validarEmail(s: String): String? {
     if (s.isBlank()) return "Ingresa tu correo electrónico"
     val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
