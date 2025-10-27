@@ -1,15 +1,14 @@
 package com.primosjoyeria.data.repository
 
 import com.primosjoyeria.data.local.ProductoDao
+import com.primosjoyeria.data.local.UserDao
 import com.primosjoyeria.data.model.CartItem
 import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.data.model.User
-import com.primosjoyeria.data.local.UserDao
-
 import kotlinx.coroutines.flow.Flow
 import com.primosjoyeria.R
 
-// ---- Interfaz del repositorio ----
+// ---- Repository interface ----
 interface CatalogRepository {
     fun productos(): Flow<List<Product>>
     fun carrito(): Flow<List<CartItem>>
@@ -19,21 +18,20 @@ interface CatalogRepository {
     suspend fun quitarDelCarrito(productId: Int)
     suspend fun vaciarCarrito()
 
-    //Funciones para el panel de administración
+    // Admin
     suspend fun agregarProducto(nombre: String, precio: Int)
     suspend fun eliminarProducto(id: Int)
-
     suspend fun actualizarProducto(id: Int, nombre: String, precio: Int)
 
-    // 👇 NUEVO: Usuarios
+    // Users
     suspend fun registrarUsuario(correo: String, password: String, sexo: String, edad: Int): Result<Unit>
     suspend fun verificarCredenciales(correo: String, password: String): Boolean
 }
 
-// ---- Implementación con Room ----
+// ---- Implementation using Room ----
 class CatalogRepositoryRoom(
     private val dao: ProductoDao,
-    private val userDao: UserDao // 👈 INYECTA UserDao
+    private val userDao: UserDao
 ) : CatalogRepository {
 
     override fun productos(): Flow<List<Product>> = dao.observarProductos()
@@ -51,22 +49,21 @@ class CatalogRepositoryRoom(
     }
 
     override suspend fun agregarAlCarrito(p: Product) {
-        val updated = dao.actualizarCantidad(p.id, 1)
+        val updated = dao.actualizarCantidadNoNegativa(p.id, +1)
         if (updated == 0) {
-            dao.upsertCarrito(CartItem(productId = p.id, nombre = p.nombre, precio = p.precio, cantidad = 1))
+            dao.upsertCarrito(
+                CartItem(
+                    productId = p.id,
+                    nombre = p.nombre,
+                    precio = p.precio,
+                    cantidad = 1
+                )
+            )
         }
     }
 
     override suspend fun cambiarCantidad(productId: Int, delta: Int) {
-        // Intenta actualizar sin pasar a negativo
-        val updated = try {
-            dao.actualizarCantidadNoNegativa(productId, delta)
-        } catch (_: Exception) {
-            // si usas la versión antigua, usa esta línea:
-            dao.actualizarCantidad(productId, delta)
-        }
-
-        // Si la cantidad quedó en 0 (o no existe), elimínalo del carrito
+        dao.actualizarCantidadNoNegativa(productId, delta)
         val cant = dao.obtenerCantidad(productId) ?: 0
         if (cant <= 0) {
             dao.eliminarDelCarrito(productId)
@@ -82,7 +79,7 @@ class CatalogRepositoryRoom(
     }
 
     override suspend fun agregarProducto(nombre: String, precio: Int) {
-        val nuevo = Product(nombre = nombre, precio = precio, imagenRes = R.drawable.logo)
+        val nuevo = Product(nombre = nombre.trim(), precio = precio, imagenRes = R.drawable.logo)
         dao.insertProductos(listOf(nuevo))
     }
 
@@ -91,13 +88,13 @@ class CatalogRepositoryRoom(
     }
 
     override suspend fun actualizarProducto(id: Int, nombre: String, precio: Int) {
-        dao.updateCampos(id, nombre, precio)
+        dao.updateCampos(id, nombre.trim(), precio)
     }
 
-    // ==== Usuarios ====
+    // ==== Users ====
     override suspend fun registrarUsuario(
         correo: String,
-        pass: String,
+        password: String,
         sexo: String,
         edad: Int
     ): Result<Unit> = try {
@@ -107,7 +104,7 @@ class CatalogRepositoryRoom(
             userDao.insert(
                 User(
                     correo = correo.trim(),
-                    pass = pass,                 // en producción: hashea
+                    pass = password,
                     sexo = sexo.trim().uppercase(),
                     edad = edad
                 )
@@ -118,7 +115,7 @@ class CatalogRepositoryRoom(
         Result.failure(e)
     }
 
-    override suspend fun verificarCredenciales(correo: String, pass: String): Boolean {
-        return userDao.validate(correo.trim(), pass) > 0
+    override suspend fun verificarCredenciales(correo: String, password: String): Boolean {
+        return userDao.validate(correo.trim(), password) > 0
     }
 }
