@@ -1,15 +1,18 @@
 package com.primosjoyeria.ui.theme.screens
 
+
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,18 +24,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.painterResource
 import com.primosjoyeria.R
 
+// Animaciones
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.animateFloatAsState
 
 @Composable
 fun LoginScreen(
     alIniciarSesion: (String, String) -> Unit,
     alRegistrarClick: () -> Unit,
-    onAdminClick: () -> Unit,  // boton admin
-    vm: FormViewModel = viewModel()
+    onAdminClick: () -> Unit,
+    vm: FormViewModel = viewModel(),
+    mensajeError: String? = null
 ) {
     val formulario: EstadoFormularioLogin = vm.estado.collectAsState().value
 
     Box(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -95,7 +108,8 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Button(
+            //  Botón con animación de presión
+            PressableButton(
                 onClick = { vm.enviarFormulario(alIniciarSesion) },
                 enabled = formulario.email.valor.isNotBlank() &&
                         formulario.password.valor.isNotBlank(),
@@ -104,16 +118,48 @@ fun LoginScreen(
                 Text("Iniciar sesión")
             }
 
+            // Mensaje de error con animación: slide + fade
+            AnimatedVisibility(
+                visible = mensajeError != null,
+                enter = slideInVertically { fullHeight -> -fullHeight } + fadeIn(),
+                exit = slideOutVertically { fullHeight -> -fullHeight } + fadeOut()
+            ) {
+                Text(
+                    text = mensajeError ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
             TextButton(onClick = alRegistrarClick) {
                 Text("¿No tienes cuenta? Regístrate aquí")
             }
 
-
             TextButton(onClick = { onAdminClick() }) {
                 Text("¿Eres administrador? Inicia sesión aquí")
             }
-
-
         }
+    }
+}
+
+
+@Composable
+private fun PressableButton(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(targetValue = if (pressed) 0.94f else 1f, label = "pressScale")
+
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        interactionSource = interaction,
+        modifier = modifier.scale(scale)
+    ) {
+        content()
     }
 }

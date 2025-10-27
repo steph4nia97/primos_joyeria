@@ -11,7 +11,7 @@ import androidx.room.Index
 data class User(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val correo: String,
-    val pass: String, // para producción usa hashing; aquí simple por demo
-    val sexo: String, // "M", "F", "Otro"
+    val pass: String,
+    val sexo: String,
     val edad: Int
 )

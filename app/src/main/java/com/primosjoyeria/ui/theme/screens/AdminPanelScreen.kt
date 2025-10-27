@@ -89,17 +89,17 @@ fun AdminPanelScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        goBack() // o onLogout() si tienes esa lambda
+                        goBack()
                     }) {
                         Text(
                             "Cerrar sesión",
-                            color = MaterialTheme.colorScheme.primary, // 👈 visible siempre
+                            color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface, // 👈 fondo claro
+                    containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -199,7 +199,7 @@ fun AdminPanelScreen(
         }
     }
 
-    // 🔹 Mostrar diálogo si hay un producto en edición
+
     editing?.let { producto ->
         EditProductDialog(
             initialName = producto.nombre,

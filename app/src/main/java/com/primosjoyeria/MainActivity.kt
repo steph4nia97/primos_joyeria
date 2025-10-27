@@ -18,7 +18,6 @@ class MainActivity : ComponentActivity() {
             AppDb::class.java,
             "primos_db"
         )
-            //.addMigrations(MIGRATION_2_3) // usa migración si no quieres borrar datos
             .fallbackToDestructiveMigration()
             .build()
 

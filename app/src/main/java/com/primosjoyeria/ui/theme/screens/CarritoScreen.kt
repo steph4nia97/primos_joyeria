@@ -35,7 +35,7 @@ fun CarritoScreen(
                 actions = {
                     TextButton(onClick = {
                         onClear()
-                        scope.launch { snackbarHostState.showSnackbar("🧹 Carrito vaciado") }
+                        scope.launch { snackbarHostState.showSnackbar("Carrito vaciado") }
                     }) { Text("Vaciar") }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -65,21 +65,20 @@ fun CarritoScreen(
                             Spacer(Modifier.height(8.dp))
                             QuantityStepper(
                                 onInc = { onInc(item.productId) },
-                                // Si la cantidad es 1 y presionan "-", eliminamos el item (no dejamos ir a 0/-)
                                 onDec = {
                                     if (item.cantidad > 1) {
                                         onDec(item.productId)
                                     } else {
                                         onRemove(item.productId)
                                         scope.launch {
-                                            snackbarHostState.showSnackbar("🗑️ ${item.nombre} eliminado")
+                                            snackbarHostState.showSnackbar(" ${item.nombre} eliminado")
                                         }
                                     }
                                 },
                                 onRemove = {
                                     onRemove(item.productId)
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("🗑️ ${item.nombre} eliminado")
+                                        snackbarHostState.showSnackbar(" ${item.nombre} eliminado")
                                     }
                                 }
                             )
@@ -88,7 +87,7 @@ fun CarritoScreen(
                 }
             }
 
-            // ✅ Total desde la lista, nunca negativo
+
             val total = remember(state.carrito) {
                 state.carrito.sumOf { it.precio * it.cantidad }.coerceAtLeast(0)
             }
@@ -106,7 +105,7 @@ fun CarritoScreen(
             Spacer(Modifier.height(12.dp))
 
             Button(
-                onClick = { /* TODO: flujo de pago */ },
+                onClick = { },
                 enabled = total > 0,
                 modifier = Modifier.fillMaxWidth()
             ) {

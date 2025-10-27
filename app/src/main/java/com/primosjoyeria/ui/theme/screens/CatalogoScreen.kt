@@ -37,7 +37,7 @@ fun CatalogoScreen(
                         onClick = goCarrito,
                         modifier = Modifier.height(36.dp)
                     ) {
-                        Text("Carrito (${state.carrito.size})")
+                        Text("Carrito (${state.carrito.sumOf { it.cantidad }})")
                     }
 
                     Spacer(Modifier.width(8.dp))
@@ -95,7 +95,7 @@ fun CatalogoScreen(
                                 onClick = {
                                     onAdd(producto)
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("✨ ${producto.nombre} agregado al carrito")
+                                        snackbarHostState.showSnackbar("${producto.nombre} agregado al carrito")
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth()

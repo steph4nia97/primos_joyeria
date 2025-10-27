@@ -53,7 +53,7 @@ fun RegistroScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            // 📧 Correo
+            // Correo
             OutlinedTextField(
                 value = correo,
                 onValueChange = { correo = it },
@@ -70,7 +70,7 @@ fun RegistroScreen(
                 )
             }
 
-            // 🔐 Contraseña
+            // Contraseña
             OutlinedTextField(
                 value = pass,
                 onValueChange = { pass = it },
@@ -88,7 +88,7 @@ fun RegistroScreen(
                 )
             }
 
-            // 🚻 Selector de sexo
+            // Selector de sexo
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -119,7 +119,7 @@ fun RegistroScreen(
                 }
             }
 
-            // 🎂 Edad
+            // Edad
             OutlinedTextField(
                 value = edad,
                 onValueChange = { edad = it.filter { ch -> ch.isDigit() } },
@@ -139,7 +139,7 @@ fun RegistroScreen(
                 )
             }
 
-            // 🔘 Botón Registrar
+            // Botón Registrar
             Button(
                 onClick = {
                     val e = edad.toIntOrNull()
@@ -156,7 +156,6 @@ fun RegistroScreen(
                                 val res = onRegistrar(correo, pass, sexo, e!!)
                                 if (res.isSuccess) {
                                     mensaje = "✅ Usuario registrado correctamente"
-                                    // Pequeña pausa opcional para mostrar el mensaje antes de volver
                                     delay(1200)
                                     onRegistroExitoso()
                                 } else {

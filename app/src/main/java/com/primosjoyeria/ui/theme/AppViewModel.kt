@@ -21,7 +21,7 @@ class AppViewModel(private val repo: CatalogRepository) : ViewModel() {
             initialValue = UiState()
         )
 
-    // Semilla inicial si la BD está vacía
+
     fun seedIfEmpty() = viewModelScope.launch { repo.seedIfEmpty() }
 
     // Acciones de UI

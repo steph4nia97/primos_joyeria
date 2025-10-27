@@ -43,7 +43,7 @@ interface ProductoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertCarrito(item: CartItem)
 
-    // Incrementa o decrementa cantidad
+
     @Query("UPDATE carrito SET cantidad = cantidad + :delta WHERE productId = :productId")
     suspend fun actualizarCantidad(productId: Int, delta: Int): Int
 
@@ -62,11 +62,11 @@ interface ProductoDao {
     @Query("DELETE FROM carrito")
     suspend fun vaciarCarrito()
 
-    // Cantidad actual de un producto
+
     @Query("SELECT cantidad FROM carrito WHERE productId = :productId LIMIT 1")
     suspend fun obtenerCantidad(productId: Int): Int?
 
-    // Total seguro (sin negativos)
+
     @Query("SELECT COALESCE(SUM(precio * cantidad), 0) FROM carrito")
     fun observarTotal(): Flow<Int>
 }

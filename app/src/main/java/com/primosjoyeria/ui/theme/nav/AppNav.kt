@@ -2,6 +2,9 @@ package com.primosjoyeria.ui.theme.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,7 +20,7 @@ import com.primosjoyeria.ui.theme.UiState
 import com.primosjoyeria.ui.theme.screens.CarritoScreen
 import com.primosjoyeria.ui.theme.screens.LoginScreen
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.setValue
 import com.primosjoyeria.ui.theme.screens.CatalogoScreen
 import com.primosjoyeria.ui.theme.screens.RegistroScreen
 import kotlinx.coroutines.launch
@@ -38,8 +41,10 @@ fun AppNav(repo: CatalogRepository) {
 
     val uiState: UiState = vm.state.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
+    var loginError by remember { mutableStateOf<String?>(null) }
 
     NavHost(navController = nav, startDestination = Routes.Login) {
+
         // LOGIN (usuarios de tabla usuario)
         composable(Routes.Login) {
             LoginScreen(
@@ -47,21 +52,21 @@ fun AppNav(repo: CatalogRepository) {
                     scope.launch {
                         val ok = repo.verificarCredenciales(correo, pass)
                         if (ok) {
+                            loginError = null
                             nav.navigate(Routes.Catalogo) {
                                 popUpTo(Routes.Login) { inclusive = true }
                                 launchSingleTop = true
                             }
                         } else {
-                            // Si tu LoginScreen tiene forma de mostrar error, puedes disparar ahí.
-                            // Aquí, simplemente no navega si no es válido.
+                            loginError = "Usuario no registrado o credenciales incorrectas"
                         }
                     }
                 },
                 alRegistrarClick = { nav.navigate(Routes.Registro) },
-                onAdminClick = { nav.navigate(Routes.AdminLogin) }
+                onAdminClick = { nav.navigate(Routes.AdminLogin) },
+                mensajeError = loginError
             )
         }
-
         // REGISTRO
         composable(Routes.Registro) {
             RegistroScreen(
@@ -78,7 +83,7 @@ fun AppNav(repo: CatalogRepository) {
                 state = uiState,
                 onAdd = vm::addToCart,
                 goCarrito = { nav.navigate(Routes.Carrito) },
-                onLogout = { // 👈 si ya agregaste el botón de cerrar sesión
+                onLogout = {
                     nav.navigate(Routes.Login) {
                         popUpTo(Routes.Login) { inclusive = true }
                         launchSingleTop = true

@@ -7,7 +7,7 @@ import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.data.model.User
 
 @Database(
-    entities = [Product::class, CartItem::class, User::class],
+    entities = [Product::class, CartItem::class, User::class], //tablas
     version = 3
 )
 abstract class AppDb : RoomDatabase() {

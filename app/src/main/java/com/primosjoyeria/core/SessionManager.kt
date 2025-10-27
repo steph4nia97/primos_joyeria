@@ -3,11 +3,11 @@ package com.primosjoyeria.core
 import android.content.Context
 import android.content.SharedPreferences
 
-object SessionManager {
+object SessionManager { //quien esta conectado y guardar la sesion
     private const val PREFS_NAME = "PrimosJoyeriaPrefs"
     private const val KEY_LOGGED_IN = "logged_in"
     private const val KEY_USERNAME = "username"
-    private const val KEY_ROLE = "role" // "admin" o "user"
+    private const val KEY_ROLE = "role" // admin o user
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -21,9 +21,6 @@ object SessionManager {
     }
 
     fun logout(ctx: Context) {
-        // Si usas FirebaseAuth, aquí va el signOut()
-        // FirebaseAuth.getInstance().signOut()
-        // Si quieres limpiar carrito/cache del repo, hazlo aquí.
         prefs(ctx).edit().clear().apply()
     }
 
