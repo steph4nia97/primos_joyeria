@@ -1,14 +1,15 @@
 package com.primosjoyeria.data.local
 
 import androidx.room.*
-import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.data.model.CartItem
+import com.primosjoyeria.data.model.Product
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductoDao {
 
-    // ===== Catálogo =====
+    // ======== Catálogo ========
+
     @Query("SELECT * FROM producto")
     fun observarProductos(): Flow<List<Product>>
 
@@ -34,19 +35,38 @@ interface ProductoDao {
     suspend fun findById(id: Long): Product?
 
 
-    // ===== Carrito =====
+    // ======== Carrito ========
+
     @Query("SELECT * FROM carrito")
     fun observarCarrito(): Flow<List<CartItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertCarrito(item: CartItem)
 
+    // Incrementa o decrementa cantidad
     @Query("UPDATE carrito SET cantidad = cantidad + :delta WHERE productId = :productId")
     suspend fun actualizarCantidad(productId: Int, delta: Int): Int
+
+    // Actualiza sin permitir negativos
+    @Query("""
+        UPDATE carrito 
+        SET cantidad = cantidad + :delta 
+        WHERE productId = :productId 
+        AND (cantidad + :delta) >= 0
+    """)
+    suspend fun actualizarCantidadNoNegativa(productId: Int, delta: Int): Int
 
     @Query("DELETE FROM carrito WHERE productId = :productId")
     suspend fun eliminarDelCarrito(productId: Int)
 
     @Query("DELETE FROM carrito")
     suspend fun vaciarCarrito()
+
+    // Cantidad actual de un producto
+    @Query("SELECT cantidad FROM carrito WHERE productId = :productId LIMIT 1")
+    suspend fun obtenerCantidad(productId: Int): Int?
+
+    // Total seguro (sin negativos)
+    @Query("SELECT COALESCE(SUM(precio * cantidad), 0) FROM carrito")
+    fun observarTotal(): Flow<Int>
 }

@@ -58,7 +58,19 @@ class CatalogRepositoryRoom(
     }
 
     override suspend fun cambiarCantidad(productId: Int, delta: Int) {
-        dao.actualizarCantidad(productId, delta)
+        // Intenta actualizar sin pasar a negativo
+        val updated = try {
+            dao.actualizarCantidadNoNegativa(productId, delta)
+        } catch (_: Exception) {
+            // si usas la versión antigua, usa esta línea:
+            dao.actualizarCantidad(productId, delta)
+        }
+
+        // Si la cantidad quedó en 0 (o no existe), elimínalo del carrito
+        val cant = dao.obtenerCantidad(productId) ?: 0
+        if (cant <= 0) {
+            dao.eliminarDelCarrito(productId)
+        }
     }
 
     override suspend fun quitarDelCarrito(productId: Int) {

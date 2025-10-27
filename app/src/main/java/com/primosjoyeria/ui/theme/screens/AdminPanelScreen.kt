@@ -80,17 +80,28 @@ fun AdminPanelScreen(
                 title = { Text("Panel de Administración") },
                 navigationIcon = {
                     IconButton(onClick = goBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 },
                 actions = {
                     TextButton(onClick = {
-                        // defines qué hace al cerrar sesión
-                        goBack()
+                        goBack() // o onLogout() si tienes esa lambda
                     }) {
-                        Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            "Cerrar sesión",
+                            color = MaterialTheme.colorScheme.primary, // 👈 visible siempre
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface, // 👈 fondo claro
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->
