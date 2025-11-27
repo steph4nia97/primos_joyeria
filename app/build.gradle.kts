@@ -15,6 +15,8 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     // Java 17 para Java y Kotlin (KSP)
@@ -48,5 +50,31 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // JUnit 5 para tests de unidad (JVM)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
+    // Kotest (matchers bonitos)
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+
+    // MockK para mocks en Kotlin
+    testImplementation("io.mockk:mockk:1.13.12")
+
+    // Coroutines test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+    // Compose UI Test (instrumented)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.4")
+    testImplementation(kotlin("test"))
+}
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

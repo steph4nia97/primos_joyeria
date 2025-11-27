@@ -8,44 +8,65 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import com.primosjoyeria.ui.theme.AuthViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.primosjoyeria.ui.theme.AuthUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroScreen(
-    onRegistrar: suspend (correo: String, pass: String, sexo: String, edad: Int) -> Result<Unit>,
+    authViewModel: AuthViewModel,   //viene de appnav
     onRegistroExitoso: () -> Unit,
     goBack: () -> Unit
 ) {
     var correo by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
-    var sexo by remember { mutableStateOf("F") }
+    var sexo by remember { mutableStateOf("X") }
     var edad by remember { mutableStateOf("") }
 
     var mensaje by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
+    val authState = authViewModel.uiState
 
-    // --- Validaciones ---
+    // VALIDACIONES
     fun correoValido(c: String): Boolean =
         android.util.Patterns.EMAIL_ADDRESS.matcher(c).matches()
-    fun passValida(p: String): Boolean = p.length >= 6
-    fun sexoValido(s: String): Boolean = s.uppercase() in listOf("F", "M", "X")
-    fun edadValida(e: Int?): Boolean = e != null && e in 1..100
 
+    fun passValida(p: String) = p.length >= 6
+    fun sexoValido(s: String) = s.uppercase() in listOf("F", "M", "X")
+    fun edadValida(e: Int?) = e != null && e in 1..100
+
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthUiState.Success -> {
+                mensaje = "✅ Cuenta creada correctamente"
+                delay(1200)
+                authViewModel.resetState()
+                onRegistroExitoso()
+            }
+            is AuthUiState.Error -> {
+                mensaje = authState.message
+            }
+            else -> Unit
+        }
+    }
+
+    // UI
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Crear cuenta") },
                 navigationIcon = {
                     TextButton(onClick = goBack) { Text("Atrás") }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -53,7 +74,7 @@ fun RegistroScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            // Correo
+            // CORREO
             OutlinedTextField(
                 value = correo,
                 onValueChange = { correo = it },
@@ -63,32 +84,21 @@ fun RegistroScreen(
                 isError = correo.isNotBlank() && !correoValido(correo)
             )
             if (correo.isNotBlank() && !correoValido(correo)) {
-                Text(
-                    "Correo inválido (ejemplo: nombre@dominio.cl)",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Text("Correo inválido", color = MaterialTheme.colorScheme.error)
             }
 
-            // Contraseña
+            // CONTRASEÑA
             OutlinedTextField(
                 value = pass,
                 onValueChange = { pass = it },
                 label = { Text("Contraseña (mínimo 6 caracteres)") },
-                visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 isError = pass.isNotBlank() && !passValida(pass)
             )
-            if (pass.isNotBlank() && !passValida(pass)) {
-                Text(
-                    "La contraseña debe tener al menos 6 caracteres",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
 
-            // Selector de sexo
+            // SEXO
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -99,19 +109,18 @@ fun RegistroScreen(
                     label = { Text("Sexo") },
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
+
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    listOf("F", "M", "X").forEach { opcion ->
+                    listOf("F", "M", "X").forEach {
                         DropdownMenuItem(
-                            text = { Text(opcion) },
+                            text = { Text(it) },
                             onClick = {
-                                sexo = opcion
+                                sexo = it
                                 expanded = false
                             }
                         )
@@ -119,49 +128,47 @@ fun RegistroScreen(
                 }
             }
 
-            // Edad
+            // EDAD
             OutlinedTextField(
                 value = edad,
-                onValueChange = { edad = it.filter { ch -> ch.isDigit() } },
-                label = { Text("Edad (1 a 100)") },
+                onValueChange = { edad = it.filter(Char::isDigit) },
+                label = { Text("Edad (1–100)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 isError = edad.isNotBlank() &&
                         !(edad.toIntOrNull()?.let { it in 1..100 } ?: false)
             )
-            if (edad.isNotBlank() &&
-                !(edad.toIntOrNull()?.let { it in 1..100 } ?: false)
-            ) {
-                Text(
-                    "La edad debe estar entre 1 y 100",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
 
-            // Botón Registrar
+            // BOTÓN REGISTRAR
             Button(
                 onClick = {
                     val e = edad.toIntOrNull()
+
                     when {
-                        correo.isBlank() || pass.isBlank() || sexo.isBlank() || edad.isBlank() -> {
+                        correo.isBlank() || pass.isBlank() || sexo.isBlank() || edad.isBlank() ->
                             mensaje = "Completa todos los campos"
-                        }
-                        !correoValido(correo) -> mensaje = "Correo inválido"
-                        !passValida(pass) -> mensaje = "La contraseña debe tener al menos 6 caracteres"
-                        !sexoValido(sexo) -> mensaje = "Selecciona un sexo válido (F, M o X)"
-                        !edadValida(e) -> mensaje = "La edad debe estar entre 1 y 100"
+
+                        !correoValido(correo) ->
+                            mensaje = "Correo inválido"
+
+                        !passValida(pass) ->
+                            mensaje = "La contraseña debe tener mínimo 6 caracteres"
+
+                        !sexoValido(sexo) ->
+                            mensaje = "Sexo inválido (F, M, X)"
+
+                        !edadValida(e) ->
+                            mensaje = "Edad debe ser entre 1 y 100"
+
                         else -> {
-                            scope.launch {
-                                val res = onRegistrar(correo, pass, sexo, e!!)
-                                if (res.isSuccess) {
-                                    mensaje = "✅ Usuario registrado correctamente"
-                                    delay(1200)
-                                    onRegistroExitoso()
-                                } else {
-                                    mensaje = res.exceptionOrNull()?.message ?: "Error al registrar"
-                                }
-                            }
+                            mensaje = null
+                            // 👇 Llamamos directo al ViewModel, él ya lanza su corrutina
+                            authViewModel.register(
+                                correo.trim(),
+                                pass,
+                                sexo,
+                                e!!
+                            )
                         }
                     }
                 },
@@ -170,13 +177,12 @@ fun RegistroScreen(
                 Text("Registrar cuenta")
             }
 
-            // 📨 Mensaje final
+            // MENSAJE
             mensaje?.let {
                 Text(
                     it,
-                    color = if (it.contains("✅")) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
+                    color = if ("✅" in it) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.error
                 )
             }
         }

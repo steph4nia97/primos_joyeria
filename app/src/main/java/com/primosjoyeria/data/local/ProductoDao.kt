@@ -6,7 +6,7 @@ import com.primosjoyeria.data.model.Product
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ProductoDao {
+public interface ProductoDao {
 
     // ======== Catálogo ========
 

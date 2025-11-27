@@ -67,8 +67,7 @@ fun AdminPanelScreen(
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf<String?>(null) }
-    var editing by remember { mutableStateOf<Product?>(null) } // 👈 producto en edición
-
+    var editing by remember { mutableStateOf<Product?>(null) }
     // Cargar productos desde la BD
     LaunchedEffect(Unit) {
         repo.productos().collect { productos = it }
@@ -159,7 +158,7 @@ fun AdminPanelScreen(
 
             Divider(Modifier.padding(vertical = 16.dp))
 
-            // 🔹 Lista de productos existentes
+            // Lista de productos existentes
             Text("Productos actuales", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
@@ -178,12 +177,10 @@ fun AdminPanelScreen(
                             }
 
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                // 🔸 Botón Editar
                                 TextButton(onClick = { editing = producto }) {
                                     Text("Editar")
                                 }
 
-                                // 🔸 Botón Eliminar
                                 TextButton(onClick = {
                                     scope.launch {
                                         repo.eliminarProducto(producto.id)

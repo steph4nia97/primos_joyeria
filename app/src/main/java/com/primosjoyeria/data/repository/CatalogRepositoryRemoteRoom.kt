@@ -8,7 +8,7 @@ import com.primosjoyeria.data.model.User
 import kotlinx.coroutines.flow.Flow
 import com.primosjoyeria.R
 
-// ---- Repository interface ----
+
 interface CatalogRepository {
     fun productos(): Flow<List<Product>>
     fun carrito(): Flow<List<CartItem>>
@@ -28,7 +28,7 @@ interface CatalogRepository {
     suspend fun verificarCredenciales(correo: String, password: String): Boolean
 }
 
-// ---- Implementation using Room ----
+// ---- Implementa Room ----
 class CatalogRepositoryRoom(
     private val dao: ProductoDao,
     private val userDao: UserDao
@@ -46,7 +46,9 @@ class CatalogRepositoryRoom(
             )
             dao.insertProductos(inicial)
         }
+
     }
+
 
     override suspend fun agregarAlCarrito(p: Product) {
         val updated = dao.actualizarCantidadNoNegativa(p.id, +1)
