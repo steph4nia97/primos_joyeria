@@ -24,26 +24,26 @@ interface ApiService {
 
     // ===== PRODUCTOS =====
 
-    @GET("/api/productos")
+    @GET("api/productos")
     suspend fun getProductos(): List<ProductDto>
 
-    @POST("/api/productos")
+    @POST("api/productos")
     suspend fun crearProducto(
-        @Body request: ProductCreateRequest
+        @Body request: ProductRequest
     ): ProductDto
 
-    @PUT("/api/productos/{id}")
+    @PUT("api/productos/{id}")
     suspend fun actualizarProducto(
         @Path("id") id: Long,
-        @Body request: ProductCreateRequest
+        @Body request: ProductRequest
     ): ProductDto
 
-    @DELETE("/api/productos/{id}")
+    @DELETE("api/productos/{id}")
     suspend fun eliminarProducto(
         @Path("id") id: Long
     )
 
     // ===== INDICADORES (DÓLAR) =====
-    @GET("/api/indicadores/dolar")
+    @GET("api/indicadores/dolar")
     suspend fun getDolarActual(): DolarDto
 }

@@ -12,19 +12,20 @@ import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.data.repository.CatalogRepository
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.ArrowBack
-
-
+import retrofit2.http.Url
 
 
 @Composable
 fun EditProductDialog(
     initialName: String,
     initialPrice: Int,
+    initialUrl: String?,
     onDismiss: () -> Unit,
-    onConfirm: (newName: String, newPrice: Int) -> Unit
+    onConfirm: (newName: String, newPrice: Int, newUrl: String?) -> Unit
 ) {
     var nombre by remember { mutableStateOf(initialName) }
     var precio by remember { mutableStateOf(initialPrice.toString()) }
+    var url by remember { mutableStateOf(initialUrl.orEmpty()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -41,13 +42,20 @@ fun EditProductDialog(
                     onValueChange = { precio = it.filter { ch -> ch.isDigit() } },
                     label = { Text("Precio") }
                 )
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = { url = it },
+                    label = { Text("URL imagen (raw GitHub, opcional)") }
+                )
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 val nuevoPrecio = precio.toIntOrNull()
+                val urlLimpia = url.trim().ifBlank { null }
+
                 if (nombre.isNotBlank() && nuevoPrecio != null) {
-                    onConfirm(nombre.trim(), nuevoPrecio)
+                    onConfirm(nombre.trim(), nuevoPrecio, urlLimpia)
                 }
             }) { Text("Guardar") }
         },
@@ -64,11 +72,15 @@ fun AdminPanelScreen(
 ) {
     val scope = rememberCoroutineScope()
     var productos by remember { mutableStateOf<List<Product>>(emptyList()) }
+
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
+    var imagenUrl by remember { mutableStateOf("") }
+
     var mensaje by remember { mutableStateOf<String?>(null) }
     var editing by remember { mutableStateOf<Product?>(null) }
-    // Cargar productos desde la BD
+
+    // Cargar productos desde la BD (Room)
     LaunchedEffect(Unit) {
         repo.productos().collect { productos = it }
     }
@@ -87,9 +99,7 @@ fun AdminPanelScreen(
                     }
                 },
                 actions = {
-                    TextButton(onClick = {
-                        goBack()
-                    }) {
+                    TextButton(onClick = { goBack() }) {
                         Text(
                             "Cerrar sesión",
                             color = MaterialTheme.colorScheme.primary,
@@ -130,17 +140,34 @@ fun AdminPanelScreen(
                 singleLine = true
             )
 
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = imagenUrl,
+                onValueChange = { imagenUrl = it },
+                label = { Text("URL imagen (raw GitHub, opcional)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
             Spacer(Modifier.height(12.dp))
 
             Button(
                 onClick = {
                     val p = precio.toIntOrNull()
+                    val urlLimpia = imagenUrl.trim().ifBlank { null }
+
                     if (nombre.isNotBlank() && p != null) {
                         scope.launch {
-                            repo.agregarProducto(nombre, p)
-                            nombre = ""
-                            precio = ""
-                            mensaje = "Producto agregado correctamente"
+                            try {
+                                repo.agregarProducto(nombre, p, urlLimpia)
+                                nombre = ""
+                                precio = ""
+                                imagenUrl = ""
+                                mensaje = "Producto agregado correctamente"
+                            } catch (e: Exception) {
+                                mensaje = "Error al agregar: ${e.message}"
+                            }
                         }
                     } else {
                         mensaje = "Debes ingresar nombre y precio válido"
@@ -173,7 +200,16 @@ fun AdminPanelScreen(
                         ) {
                             Column {
                                 Text(producto.nombre, style = MaterialTheme.typography.bodyLarge)
-                                Text("$${producto.precio}", style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    "$${producto.precio}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                if (!producto.imagenUrl.isNullOrBlank()) {
+                                    Text(
+                                        "Tiene imagen",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
 
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -183,7 +219,11 @@ fun AdminPanelScreen(
 
                                 TextButton(onClick = {
                                     scope.launch {
-                                        repo.eliminarProducto(producto.id)
+                                        try {
+                                            repo.eliminarProducto(producto.id)
+                                        } catch (e: Exception) {
+                                            mensaje = "Error al eliminar: ${e.message}"
+                                        }
                                     }
                                 }) {
                                     Text("Eliminar")
@@ -196,17 +236,27 @@ fun AdminPanelScreen(
         }
     }
 
-
     editing?.let { producto ->
         EditProductDialog(
             initialName = producto.nombre,
             initialPrice = producto.precio,
+            initialUrl = producto.imagenUrl,
             onDismiss = { editing = null },
-            onConfirm = { newName, newPrice ->
+            onConfirm = { newName, newPrice, newUrl ->
                 scope.launch {
-                    repo.actualizarProducto(producto.id, newName, newPrice)
-                    mensaje = "Producto actualizado correctamente"
-                    editing = null
+                    try {
+                        repo.actualizarProducto(
+                            producto.id,
+                            newName,
+                            newPrice,
+                            newUrl
+                        )
+                        mensaje = "Producto actualizado correctamente"
+                    } catch (e: Exception) {
+                        mensaje = "Error al actualizar: ${e.message}"
+                    } finally {
+                        editing = null
+                    }
                 }
             }
         )

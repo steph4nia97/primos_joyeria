@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.room.Room
 import com.primosjoyeria.data.local.AppDb
+import com.primosjoyeria.data.remote.auth.RetrofitClient
 
 import com.primosjoyeria.data.repository.CatalogRepositoryRoom
 import com.primosjoyeria.ui.theme.AppTheme
@@ -16,14 +17,15 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(
             applicationContext,
             AppDb::class.java,
-            "primos_db"
+            "primosjoyeria.db"
         )
             .fallbackToDestructiveMigration()
             .build()
 
         val repo = CatalogRepositoryRoom(
             dao = db.productoDao(),
-            userDao = db.userDao()
+            userDao = db.userDao(),
+            api = RetrofitClient.api
         )
         setContent {
             AppTheme {

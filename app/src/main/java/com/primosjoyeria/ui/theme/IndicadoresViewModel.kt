@@ -27,6 +27,7 @@ class IndicadoresViewModel : ViewModel() {
                 error = null
                 dolar = RetrofitClient.api.getDolarActual()
             } catch (e: Exception) {
+                e.printStackTrace() // logcat
                 error = e.message ?: "Error al obtener el valor del dólar"
                 dolar = null
             } finally {

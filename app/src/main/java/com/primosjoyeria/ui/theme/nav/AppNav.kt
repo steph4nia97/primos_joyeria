@@ -81,6 +81,7 @@ fun AppNav(repo: CatalogRepository) {
         composable(Routes.Catalogo) {
             CatalogoScreen(
                 state = uiState,
+                viewModel = vm,                 // 👈 aquí sí va la variable vm
                 onAdd = vm::addToCart,
                 goCarrito = { nav.navigate(Routes.Carrito) },
                 onLogout = {

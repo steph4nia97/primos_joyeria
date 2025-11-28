@@ -18,9 +18,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun CarritoScreen(
     state: UiState,
-    onInc: (Int) -> Unit,
-    onDec: (Int) -> Unit,
-    onRemove: (Int) -> Unit,
+    onInc: (Long) -> Unit,
+    onDec: (Long) -> Unit,
+    onRemove: (Long) -> Unit,
     onClear: () -> Unit,
     goBack: () -> Unit
 ) {

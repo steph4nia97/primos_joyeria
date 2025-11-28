@@ -47,15 +47,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.primosjoyeria.ui.theme.IndicadoresViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import coil.compose.AsyncImage
+import com.primosjoyeria.ui.theme.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
-
-
 fun CatalogoScreen(
     state: UiState,
+    viewModel: AppViewModel,
     onAdd: (Product) -> Unit,
     goCarrito: () -> Unit,
     onLogout: () -> Unit,
@@ -70,10 +71,12 @@ fun CatalogoScreen(
     val errorDolar = indicadoresVm.error
     val loadingDolar = indicadoresVm.loading
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect("dolar") {
         indicadoresVm.cargarDolar()
     }
-
+    LaunchedEffect(Unit) {
+        viewModel.seedIfEmpty()
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -140,12 +143,16 @@ fun CatalogoScreen(
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            Image(
-                                painter = painterResource(id = producto.imagenRes),
+
+                            // 👉 AHORA USAMOS imagenUrl (backend) + Coil
+                            AsyncImage(
+                                model = producto.imagenUrl
+                                    ?: R.drawable.logo, // fallback si por alguna razón viene null
                                 contentDescription = producto.nombre,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(180.dp),
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
                                 contentScale = ContentScale.Crop
                             )
 

@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(private val repo: CatalogRepository) : ViewModel() {
 
-
     val state: StateFlow<UiState> =
         combine(repo.productos(), repo.carrito()) { prods, cart ->
             UiState(productos = prods, carrito = cart)
@@ -21,13 +20,21 @@ class AppViewModel(private val repo: CatalogRepository) : ViewModel() {
             initialValue = UiState()
         )
 
-
     fun seedIfEmpty() = viewModelScope.launch { repo.seedIfEmpty() }
 
-
     fun addToCart(p: Product) = viewModelScope.launch { repo.agregarAlCarrito(p) }
-    fun inc(id: Int)        = viewModelScope.launch { repo.cambiarCantidad(id, +1) }
-    fun dec(id: Int)        = viewModelScope.launch { repo.cambiarCantidad(id, -1) }
-    fun remove(id: Int)     = viewModelScope.launch { repo.quitarDelCarrito(id) }
-    fun clearCart()         = viewModelScope.launch { repo.vaciarCarrito() }
+
+    fun inc(id: Long) = viewModelScope.launch {
+        repo.cambiarCantidad(id, +1)
+    }
+
+    fun dec(id: Long) = viewModelScope.launch {
+        repo.cambiarCantidad(id, -1)
+    }
+
+    fun remove(id: Long) = viewModelScope.launch {
+        repo.quitarDelCarrito(id)
+    }
+
+    fun clearCart() = viewModelScope.launch { repo.vaciarCarrito() }
 }

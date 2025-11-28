@@ -49,6 +49,8 @@ dependencies {
 
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
@@ -57,7 +59,6 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-
     // JUnit 5 para tests de unidad (JVM)
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 

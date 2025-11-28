@@ -8,28 +8,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.primosjoyeria.data.model.Product
 import com.primosjoyeria.util.clp
-import coil.compose.AsyncImage
+import com.primosjoyeria.R
+
 
 @Composable
 fun ProductCard(product: Product, onAdd: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp)) {
-                Image(
-                    painter = painterResource(id = product.imagenRes),
-                    contentDescription = product.nombre,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    contentScale = ContentScale.FillWidth
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-            Text(product.nombre, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(6.dp))
-            Text(clp(product.precio))
+        Column(Modifier.padding(all = 12.dp)) {
+
+            val painter = rememberAsyncImagePainter(
+                model = "https://picsum.photos/600/400"
+            )
+
+
+            Image(
+                painter = painter,
+                contentDescription = product.nombre,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                contentScale = ContentScale.Crop
+            )
+
             Spacer(Modifier.height(8.dp))
-            Row { Button(onClick = onAdd) { Text("Agregar") } }
+
+            Text(text = product.nombre, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(6.dp))
+            Text(text = clp(product.precio))
+            Spacer(Modifier.height(8.dp))
+            Row {
+                Button(onClick = onAdd) { Text("Agregar") }
+            }
         }
     }
+}
