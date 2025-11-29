@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 import com.primosjoyeria.ui.theme.AppViewModel
+import com.primosjoyeria.ui.theme.ViewModel.MetalViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,27 +61,34 @@ fun CatalogoScreen(
     onAdd: (Product) -> Unit,
     goCarrito: () -> Unit,
     onLogout: () -> Unit,
-    indicadoresVm: IndicadoresViewModel = viewModel()
+    indicadoresVm: IndicadoresViewModel = viewModel(),
+    metalVm: MetalViewModel = viewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Estado del dólar
+    // --- Dólar ---
     val dolar = indicadoresVm.dolar
     val errorDolar = indicadoresVm.error
     val loadingDolar = indicadoresVm.loading
 
-    LaunchedEffect("dolar") {
-        indicadoresVm.cargarDolar()
-    }
+    // --- Oro ---
+    val oro = metalVm.oro
+    val errorOro = metalVm.error
+    val loadingOro = metalVm.loading
+
+    // Cargar datos iniciales
     LaunchedEffect(Unit) {
         viewModel.seedIfEmpty()
+        indicadoresVm.cargarDolar()
+        metalVm.cargarPrecioOro()
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Catálogo Joyería") },
+                title = { Text("Catálogo Joyas") },
                 actions = {
                     AnimatedButton(
                         onClick = goCarrito,
@@ -114,7 +122,7 @@ fun CatalogoScreen(
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     context.startActivity(intent)
                 },
-                containerColor = Color(0xFF29B100),   // verde WhatsApp
+                containerColor = Color(0xFF29B100),
                 shape = CircleShape
             ) {
                 Image(
@@ -144,10 +152,8 @@ fun CatalogoScreen(
                     ) {
                         Column(Modifier.padding(12.dp)) {
 
-                            // 👉 AHORA USAMOS imagenUrl (backend) + Coil
                             AsyncImage(
-                                model = producto.imagenUrl
-                                    ?: R.drawable.logo, // fallback si por alguna razón viene null
+                                model = producto.imagenUrl ?: R.drawable.logo,
                                 contentDescription = producto.nombre,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -186,10 +192,70 @@ fun CatalogoScreen(
                     }
                 }
 
-                // ==== ÍTEM FINAL: INDICADOR DEL DÓLAR ====
                 item {
                     Spacer(Modifier.height(24.dp))
 
+                    when {
+                        loadingOro -> {
+                            Text(
+                                "Cargando valor del oro...",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
+                        oro != null -> {
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        "Valor del Oro por Gramo",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Text(
+                                        text = "${oro.precioGramoClp.toInt()} CLP",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Actualizado: ${oro.fecha}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Text(
+                                        text = "Valor referencial del gramo en CLP.",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+                        }
+
+                        errorOro != null -> {
+                            Text(
+                                text = "No se pudo obtener el valor del oro",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+                item {
                     when {
                         loadingDolar -> {
                             Text(
@@ -215,7 +281,7 @@ fun CatalogoScreen(
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Text(
-                                        "Indicador precio del dolar",
+                                        "Indicador precio del dólar",
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                     Text(

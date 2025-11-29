@@ -46,4 +46,9 @@ interface ApiService {
     // ===== INDICADORES (DÓLAR) =====
     @GET("api/indicadores/dolar")
     suspend fun getDolarActual(): DolarDto
+
+
+    @GET("api/metal/oro")
+    suspend fun getPrecioOro(): MetalPrecioDto
+
 }
