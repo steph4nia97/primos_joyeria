@@ -220,11 +220,11 @@ fun CatalogoScreen(
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Text(
-                                        "Valor del Oro por Gramo",
+                                        "Valor del Oro por Gramo 24k",
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                     Text(
-                                        text = "${oro.precioGramoClp.toInt()} CLP",
+                                        text = "$${oro.precioGramoClp.toInt()} CLP",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
