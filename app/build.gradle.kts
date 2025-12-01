@@ -19,6 +19,7 @@ android {
 
     }
 
+
     // Java 17 para Java y Kotlin (KSP)
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -50,7 +51,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
-
+    testImplementation("junit:junit:4.13.2")
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
@@ -59,8 +60,6 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    // JUnit 5 para tests de unidad (JVM)
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 
     // Kotest (matchers bonitos)
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
@@ -74,8 +73,16 @@ dependencies {
     // Compose UI Test (instrumented)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.4")
-    testImplementation(kotlin("test"))
-}
-tasks.withType<Test> {
-    useJUnitPlatform()
+
+    // BOM de Compose (puedes ajustar la versión si ya usas otra)
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    debugImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+
+    // Tests de Compose UI
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // AndroidX Test (JUnit y Espresso) — versiones nuevas
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }

@@ -16,39 +16,39 @@ interface ApiService {
 
     // ===== AUTH =====
 
-    @POST("api/auth/login")
+    @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
-    @POST("api/auth/register")
+    @POST("auth/register")
     suspend fun register(@Body request: RegistroRequest): LoginResponse
 
     // ===== PRODUCTOS =====
 
-    @GET("api/productos")
+    @GET("productos")
     suspend fun getProductos(): List<ProductDto>
 
-    @POST("api/productos")
+    @POST("productos")
     suspend fun crearProducto(
         @Body request: ProductRequest
     ): ProductDto
 
-    @PUT("api/productos/{id}")
+    @PUT("productos/{id}")
     suspend fun actualizarProducto(
         @Path("id") id: Long,
         @Body request: ProductRequest
     ): ProductDto
 
-    @DELETE("api/productos/{id}")
+    @DELETE("productos/{id}")
     suspend fun eliminarProducto(
         @Path("id") id: Long
     )
 
     // ===== INDICADORES (DÓLAR) =====
-    @GET("api/indicadores/dolar")
+    @GET("indicadores/dolar")
     suspend fun getDolarActual(): DolarDto
 
 
-    @GET("api/metal/oro")
+    @GET("metal/oro")
     suspend fun getPrecioOro(): MetalPrecioDto
 
 }
